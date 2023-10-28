@@ -6,14 +6,22 @@ function createToken(user: IUser) {
   return jwt.sign(
     { id: user.id, alias: user.alias },
     `${process.env.JWTSECRET}`,
-    { expiresIn: "12d" }
+    { expiresIn: "5d" }
   );
+}
+
+function validateEmail(email: string) {
+  const emailRegex =
+    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return emailRegex.test(String(email).toLowerCase());
 }
 
 export const signUp = async function (
   req: Request,
   res: Response
 ): Promise<Response> {
+  const newUser = new users(req.body);
+
   if (
     !req.body.alias ||
     !req.body.password ||
@@ -27,45 +35,54 @@ export const signUp = async function (
   const userAlias = await users.findOne({ alias: req.body.alias });
   const userEmail = await users.findOne({ email: req.body.email });
   if (userAlias || userEmail) {
-    return res.status(400).json({ msg: "The user already exists" });
+    return res
+      .status(400)
+      .json({ msg: "The user/email is already registered" });
+  } else if (req.body.password.length < 8) {
+    return res
+      .status(400)
+      .json({ msg: "The password must be at least 8 characters" });
+  } else if (req.body.password.length > 16) {
+    return res
+      .status(400)
+      .json({ msg: "The password must be less than 16 characters" });
+  } else if (!validateEmail(req.body.email)) {
+    return res.status(400).json({ msg: "The email is not valid" });
   }
-
-  // We create an instance of the model 'users' which makes it a 'document' and documents are entries stored inside a collection
-  const newUser = new users(req.body);
-  // .save() Saves this document 'newUser' by inserting a new document into the database
-  await newUser.save();
+  await newUser
+    .save()
+    .then(() => {
+      console.log("user saved");
+    })
+    .catch((err) => {
+      return res.status(400).json(err);
+    });
 
   return res.json(newUser);
 };
 
 export const signIn = async function (req: Request, res: Response) {
-  if (!req.body.alias || !req.body.password) {
-    return res.status(400).json({ msg: "Please send your alias and password" });
-  }
-
   const user = await users.findOne({ alias: req.body.alias });
-  if (!user) {
+  if (!req.body.alias || !req.body.password) {
+    return res.status(400).json({ msg: "Please send valid data" });
+  } else if (!user) {
     return res.status(400).json({ msg: "User not found" });
   }
 
   const isMatch = await user.comparePassword(req.body.password);
-  if (isMatch) {
+  if (user && isMatch) {
     const token = createToken(user);
     return res.json({ jwt: token, user: user });
   }
 
-  return res
-    .status(400)
-    .json({ msg: "Either the password or the alias are wrong, check again" });
+  return res.status(400).json({ msg: "The Password/Alias is wrong" });
 };
 
 export const deleteUser = async function (req: Request, res: Response) {
+  const user = await users.findOne({ alias: req.params.user });
   if (!req.body.password) {
     return res.status(400).json({ msg: "Please send valid data" });
-  }
-
-  const user = await users.findOne({ alias: req.params.user });
-  if (!user) {
+  } else if (!user) {
     return res.status(400).json({ msg: "User not found" });
   }
 
@@ -88,10 +105,12 @@ export const updateInfo = async function (req: Request, res: Response) {
 
   const isMatch = await user.comparePassword(req.body.oldPass);
   if (user && isMatch) {
+    user.password =
+      req.body.newPass !== "" ? req.body.newPass : req.body.oldPass;
     user.name = req.body.name !== "" ? req.body.name : user.name;
     user.lname = req.body.lname !== "" ? req.body.lname : user.lname;
     user.email = req.body.email !== "" ? req.body.email : user.email;
-    user.password = req.body.newPass !== "" ? req.body.newPass : user.password;
+    user.bios = req.body.bios !== "" ? req.body.bios : user.bios;
     await user.save();
     return res.status(200).json({ msg: "user updated" });
   }
@@ -100,3 +119,23 @@ export const updateInfo = async function (req: Request, res: Response) {
     .status(400)
     .json({ msg: "Encountered and error during this process" });
 };
+
+/* example of data
+  {
+      "name": "Eduardo",
+      "lname": "Morales",
+      "email": "EdMo@gmail.com",
+      "alias": "Ed_123",
+      "bios": "Hi, i'm a computer engineering student",
+      "password": "bruh-123"
+  }
+
+  {
+    "name": "Alonso",
+    "lname": "Rondon",
+    "email": "Hell@gmail.com",
+    "bios": "I want to be a programmer",
+    "oldPass": "bruh-123",
+    "newPass": ""
+  }
+*/

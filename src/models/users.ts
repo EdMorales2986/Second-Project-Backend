@@ -7,7 +7,8 @@ export interface IUser extends mongoose.Document {
   email: string;
   alias: string;
   password: string;
-  notes: string[];
+  bios: string;
+  tweets: string[];
   comparePassword: (password: string) => Promise<boolean>;
 }
 
@@ -36,13 +37,21 @@ const userSchema = new mongoose.Schema({
     unique: true,
     require: true,
     trim: true,
+    inmutable: true,
   },
   password: {
     type: String,
     require: true,
+    minlength: [8, "Password must be at least 8 characters"],
+    maxlength: [16, "Password must be less than 16 characters"],
   },
-  notes: {
+  bios: {
+    type: String,
+    default: "",
+  },
+  tweets: {
     type: [String],
+    default: [],
   },
 });
 
@@ -50,11 +59,10 @@ const userSchema = new mongoose.Schema({
 // This will run before any document.save()
 userSchema.pre<IUser>("save", async function (next) {
   const user = this;
-  // if password is not being modified it will skip
+
   if (!user.isModified("password")) {
     return next();
   }
-  // Process to cipher/encrypt a password (Hashing)
   const salt = await bcrypt.genSalt(10);
   const hash = await bcrypt.hash(user.password, salt);
   user.password = hash;

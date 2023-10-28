@@ -5,7 +5,7 @@ import "dotenv/config";
 import passport from "passport";
 import passportMiddleWare from "./middlewares/passport";
 
-import authRoutes from "./routes/auth.routes";
+import authRoutes from "./routes/user.routes";
 
 // Init
 const app = express();

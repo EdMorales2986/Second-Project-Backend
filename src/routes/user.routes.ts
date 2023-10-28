@@ -4,7 +4,7 @@ import {
   signUp,
   deleteUser,
   updateInfo,
-} from "../controllers/auth.controllers";
+} from "../controllers/user.controllers";
 import passport from "passport";
 
 const router = Router();
@@ -19,8 +19,7 @@ router.post(
 
 router.post("/signup", signUp);
 router.post("/signin", signIn);
-router.delete("/signin/:user/delete", deleteUser);
-
-router.put("/signin/:user/update", updateInfo);
+router.delete("/:user/delete", deleteUser);
+router.put("/:user/update", updateInfo);
 
 export default router;
