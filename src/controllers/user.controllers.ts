@@ -138,6 +138,19 @@ export const updateBio = async function (req: Request, res: Response) {
   return res.status(200).json({ msg: "Bio updated" });
 };
 
+export const searchUser = async function (req: Request, res: Response) {
+  const searchQuery = req.body.query;
+
+  try {
+    const user = await users.find({
+      alias: { $regex: searchQuery, $options: "i" },
+    });
+    return res.status(200).json(user);
+  } catch (error) {
+    return res.status(400).json({ msg: "User not found" });
+  }
+};
+
 /* example of data
   {
       "name": "Eduardo",

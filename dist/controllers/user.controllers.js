@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateBio = exports.updateInfo = exports.deleteUser = exports.signIn = exports.signUp = void 0;
+exports.searchUser = exports.updateBio = exports.updateInfo = exports.deleteUser = exports.signIn = exports.signUp = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const users_1 = __importDefault(require("../models/users"));
 const followers_1 = __importDefault(require("../models/followers"));
@@ -145,6 +145,21 @@ const updateBio = function (req, res) {
     });
 };
 exports.updateBio = updateBio;
+const searchUser = function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const searchQuery = req.body.query;
+        try {
+            const user = yield users_1.default.find({
+                alias: { $regex: searchQuery, $options: "i" },
+            });
+            return res.status(200).json(user);
+        }
+        catch (error) {
+            return res.status(400).json({ msg: "User not found" });
+        }
+    });
+};
+exports.searchUser = searchUser;
 /* example of data
   {
       "name": "Eduardo",

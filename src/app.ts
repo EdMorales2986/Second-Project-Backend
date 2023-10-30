@@ -7,6 +7,7 @@ import passportMiddleWare from "./middlewares/passport";
 
 import userRoutes from "./routes/user.routes";
 import tweetsRoutes from "./routes/tweets.routes";
+import likesRoutes from "./routes/likes.routes";
 
 // Init
 const app = express();
@@ -26,6 +27,7 @@ passport.use(passportMiddleWare);
 // Routes
 app.use(userRoutes);
 app.use(tweetsRoutes);
+app.use(likesRoutes);
 app.get("/", function (req: express.Request, res: express.Response) {
   res.send(`http://localhost:${app.get("port")}`);
 });
