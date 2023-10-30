@@ -8,7 +8,8 @@ export interface IUser extends mongoose.Document {
   alias: string;
   password: string;
   bios: string;
-  tweets: string[];
+  // tweets: string[];
+  // followers: string[];
   comparePassword: (password: string) => Promise<boolean>;
 }
 
@@ -42,17 +43,21 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     require: true,
-    minlength: [8, "Password must be at least 8 characters"],
-    maxlength: [16, "Password must be less than 16 characters"],
+    // minlength: [8, "Password must be at least 8 characters"],
+    // maxlength: [16, "Password must be less than 16 characters"],
   },
   bios: {
     type: String,
     default: "",
   },
-  tweets: {
-    type: [String],
-    default: [],
-  },
+  // tweets: {
+  //   type: [String],
+  //   default: [],
+  // },
+  // followers: {
+  //   type: [String],
+  //   default: [],
+  // },
 });
 
 // Register Password Encryption

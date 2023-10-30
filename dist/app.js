@@ -10,6 +10,7 @@ require("dotenv/config");
 const passport_1 = __importDefault(require("passport"));
 const passport_2 = __importDefault(require("./middlewares/passport"));
 const user_routes_1 = __importDefault(require("./routes/user.routes"));
+const tweets_routes_1 = __importDefault(require("./routes/tweets.routes"));
 // Init
 const app = (0, express_1.default)();
 // Settings
@@ -23,6 +24,7 @@ app.use(passport_1.default.initialize());
 passport_1.default.use(passport_2.default);
 // Routes
 app.use(user_routes_1.default);
+app.use(tweets_routes_1.default);
 app.get("/", function (req, res) {
     res.send(`http://localhost:${app.get("port")}`);
 });

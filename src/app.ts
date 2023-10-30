@@ -5,7 +5,8 @@ import "dotenv/config";
 import passport from "passport";
 import passportMiddleWare from "./middlewares/passport";
 
-import authRoutes from "./routes/user.routes";
+import userRoutes from "./routes/user.routes";
+import tweetsRoutes from "./routes/tweets.routes";
 
 // Init
 const app = express();
@@ -23,7 +24,8 @@ app.use(passport.initialize());
 passport.use(passportMiddleWare);
 
 // Routes
-app.use(authRoutes);
+app.use(userRoutes);
+app.use(tweetsRoutes);
 app.get("/", function (req: express.Request, res: express.Response) {
   res.send(`http://localhost:${app.get("port")}`);
 });

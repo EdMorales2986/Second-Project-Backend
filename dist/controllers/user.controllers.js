@@ -12,15 +12,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateInfo = exports.deleteUser = exports.signIn = exports.signUp = void 0;
-const users_1 = __importDefault(require("../models/users"));
+exports.updateBio = exports.updateInfo = exports.deleteUser = exports.signIn = exports.signUp = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const users_1 = __importDefault(require("../models/users"));
+const followers_1 = __importDefault(require("../models/followers"));
+const likes_1 = __importDefault(require("../models/likes"));
+const tweets_1 = __importDefault(require("../models/tweets"));
+const comments_1 = __importDefault(require("../models/comments"));
 function createToken(user) {
-    return jsonwebtoken_1.default.sign({ id: user.id, alias: user.alias }, `${process.env.JWTSECRET}`, { expiresIn: "5d" });
+    return jsonwebtoken_1.default.sign({ id: user.id, alias: user.alias }, `${process.env.JWTSECRET}`, { expiresIn: "1800000" });
 }
-function validator(email) {
-    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(String(email).toLowerCase());
+function validateEmail(email) {
+    const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return emailRegex.test(String(email).toLowerCase());
 }
 const signUp = function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -49,7 +53,7 @@ const signUp = function (req, res) {
                 .status(400)
                 .json({ msg: "The password must be less than 16 characters" });
         }
-        else if (!validator(req.body.email)) {
+        else if (!validateEmail(req.body.email)) {
             return res.status(400).json({ msg: "The email is not valid" });
         }
         yield newUser
@@ -94,6 +98,10 @@ const deleteUser = function (req, res) {
         const isMatch = yield user.comparePassword(req.body.password);
         if (user && isMatch) {
             yield users_1.default.deleteOne({ alias: req.params.user });
+            yield followers_1.default.deleteMany({ followed: req.params.user });
+            yield likes_1.default.deleteMany({ owner: req.params.user });
+            yield tweets_1.default.deleteMany({ owner: req.params.user });
+            yield comments_1.default.deleteMany({ owner: req.params.user });
             return res.status(200).json({ msg: "user deleted" });
         }
         return res
@@ -125,6 +133,18 @@ const updateInfo = function (req, res) {
     });
 };
 exports.updateInfo = updateInfo;
+const updateBio = function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const user = yield users_1.default.findOne({ alias: req.params.user });
+        if (!user) {
+            return res.status(400).json({ msg: "User not found" });
+        }
+        user.bios = req.body.bios;
+        yield user.save();
+        return res.status(200).json({ msg: "Bio updated" });
+    });
+};
+exports.updateBio = updateBio;
 /* example of data
   {
       "name": "Eduardo",
@@ -134,7 +154,14 @@ exports.updateInfo = updateInfo;
       "bios": "Hi, i'm a computer engineering student",
       "password": "bruh-123"
   }
-
+  {
+      "name": "Alonso",
+      "lname": "Rondon",
+      "email": "AlRo@gmail.com",
+      "alias": "Al_123",
+      "bios": "Hi, i'm a computer engineering student",
+      "password": "bruh-123"
+  }
   {
     "name": "Alonso",
     "lname": "Rondon",

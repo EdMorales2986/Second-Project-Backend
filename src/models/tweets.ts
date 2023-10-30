@@ -2,10 +2,10 @@ import mongoose from "mongoose";
 
 export interface ITweet extends mongoose.Document {
   owner: string;
-  content: string;
-  likes: number;
+  desc: string;
   image: string;
-  comparePassword: (password: string) => Promise<boolean>;
+  // comments: string[];
+  // likes: string[];
 }
 
 const tweetSchema = new mongoose.Schema(
@@ -15,19 +15,23 @@ const tweetSchema = new mongoose.Schema(
       require: true,
       trim: true,
     },
-    content: {
+    desc: {
       type: String,
       require: true,
       trim: true,
-    },
-    likes: {
-      type: Number,
-      default: 0,
     },
     image: {
       type: String,
       trim: true,
     },
+    // likes: {
+    //   type: [String],
+    //   default: [],
+    // },
+    // comments: {
+    //   type: [String],
+    //   default: [],
+    // },
   },
   {
     timestamps: true,

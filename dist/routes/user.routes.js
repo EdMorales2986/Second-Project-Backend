@@ -14,4 +14,5 @@ router.post("/signup", user_controllers_1.signUp);
 router.post("/signin", user_controllers_1.signIn);
 router.delete("/:user/delete", user_controllers_1.deleteUser);
 router.put("/:user/update", user_controllers_1.updateInfo);
+router.put("/:user/updateBio", user_controllers_1.updateBio);
 exports.default = router;

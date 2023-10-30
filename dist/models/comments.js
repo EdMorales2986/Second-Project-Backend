@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
-const tweetSchema = new mongoose_1.default.Schema({
+const CommentSchema = new mongoose_1.default.Schema({
     owner: {
         type: String,
         require: true,
@@ -19,15 +19,16 @@ const tweetSchema = new mongoose_1.default.Schema({
         type: String,
         trim: true,
     },
-    // likes: {
-    //   type: [String],
-    //   default: [],
-    // },
-    // comments: {
-    //   type: [String],
-    //   default: [],
-    // },
+    father: {
+        type: String,
+        require: true,
+        trim: true,
+    },
+    likes: {
+        type: [String],
+        default: [],
+    },
 }, {
     timestamps: true,
 });
-exports.default = mongoose_1.default.model("tweet", tweetSchema);
+exports.default = mongoose_1.default.model("Comment", CommentSchema);

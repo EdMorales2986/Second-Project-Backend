@@ -1,12 +1,16 @@
 import { Request, Response, NextFunction } from "express";
-import users, { IUser } from "../models/users";
 import jwt from "jsonwebtoken";
+import users, { IUser } from "../models/users";
+import followers, { IFollower } from "../models/followers";
+import likes, { ILike } from "../models/likes";
+import tweets, { ITweet } from "../models/tweets";
+import comments, { IComment } from "../models/comments";
 
 function createToken(user: IUser) {
   return jwt.sign(
     { id: user.id, alias: user.alias },
     `${process.env.JWTSECRET}`,
-    { expiresIn: "5d" }
+    { expiresIn: "1800000" }
   );
 }
 
@@ -89,6 +93,10 @@ export const deleteUser = async function (req: Request, res: Response) {
   const isMatch = await user.comparePassword(req.body.password);
   if (user && isMatch) {
     await users.deleteOne({ alias: req.params.user });
+    await followers.deleteMany({ followed: req.params.user });
+    await likes.deleteMany({ owner: req.params.user });
+    await tweets.deleteMany({ owner: req.params.user });
+    await comments.deleteMany({ owner: req.params.user });
     return res.status(200).json({ msg: "user deleted" });
   }
 
@@ -120,6 +128,16 @@ export const updateInfo = async function (req: Request, res: Response) {
     .json({ msg: "Encountered and error during this process" });
 };
 
+export const updateBio = async function (req: Request, res: Response) {
+  const user = await users.findOne({ alias: req.params.user });
+  if (!user) {
+    return res.status(400).json({ msg: "User not found" });
+  }
+  user.bios = req.body.bios;
+  await user.save();
+  return res.status(200).json({ msg: "Bio updated" });
+};
+
 /* example of data
   {
       "name": "Eduardo",
@@ -129,7 +147,14 @@ export const updateInfo = async function (req: Request, res: Response) {
       "bios": "Hi, i'm a computer engineering student",
       "password": "bruh-123"
   }
-
+  {
+      "name": "Alonso",
+      "lname": "Rondon",
+      "email": "AlRo@gmail.com",
+      "alias": "Al_123",
+      "bios": "Hi, i'm a computer engineering student",
+      "password": "bruh-123"
+  }
   {
     "name": "Alonso",
     "lname": "Rondon",

@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 // Config Mongoose
-mongoose.connect(`${process.env.URI}`, { dbName: "Second-SQL" });
+mongoose.connect(`${process.env.URI}`, { dbName: "Twitter-Like" });
 const connection = mongoose.connection;
 
 // Msg: Connection Stablished

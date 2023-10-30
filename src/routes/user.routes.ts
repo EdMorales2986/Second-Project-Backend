@@ -4,6 +4,7 @@ import {
   signUp,
   deleteUser,
   updateInfo,
+  updateBio,
 } from "../controllers/user.controllers";
 import passport from "passport";
 
@@ -21,5 +22,6 @@ router.post("/signup", signUp);
 router.post("/signin", signIn);
 router.delete("/:user/delete", deleteUser);
 router.put("/:user/update", updateInfo);
+router.put("/:user/updateBio", updateBio);
 
 export default router;
