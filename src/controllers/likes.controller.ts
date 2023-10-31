@@ -8,7 +8,10 @@ import comments, { IComment } from "../models/comments";
 export const likeStatus = async function (req: Request, res: Response) {
   const user = await users.findOne({ alias: req.params.user });
   const tweet = await tweets.findOne({ _id: req.params.id });
-  const isLiked = await likes.findOne({ father: req.params.id });
+  const isLiked = await likes.findOne({
+    father: req.params.id,
+    owner: req.params.user,
+  });
 
   if (user && tweet) {
     if (!isLiked && tweet.owner !== req.params.user) {

@@ -24,10 +24,10 @@ const CommentSchema = new mongoose_1.default.Schema({
         require: true,
         trim: true,
     },
-    likes: {
-        type: [String],
-        default: [],
-    },
+    // likes: {
+    //   type: [String],
+    //   default: [],
+    // },
 }, {
     timestamps: true,
 });

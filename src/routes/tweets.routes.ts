@@ -12,8 +12,8 @@ const router = Router();
 
 router.get("/showAllTweetsNew", getAllTweetsNew);
 router.get("/showAllTweetsOld", getAllTweetsOld);
-router.post("/showAllTweetsLiked/:user", getAllTweetsLiked);
-router.post("/showAllFollowedTweets/:user", getAllFollowedTweets);
+router.get("/showAllTweetsLiked/:user", getAllTweetsLiked);
+router.get("/showAllFollowedTweets/:user", getAllFollowedTweets);
 router.post("/createTweet/:user", createTweet);
 router.delete("/deleteTweet/:user/:id", deleteTweet);
 

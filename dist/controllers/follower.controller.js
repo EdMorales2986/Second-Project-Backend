@@ -12,41 +12,40 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.countLikes = exports.verifyStatus = exports.likeStatus = void 0;
+exports.countFollowers = exports.verifyStatus = exports.followStatus = void 0;
 const users_1 = __importDefault(require("../models/users"));
-const likes_1 = __importDefault(require("../models/likes"));
-const tweets_1 = __importDefault(require("../models/tweets"));
-const likeStatus = function (req, res) {
+const followers_1 = __importDefault(require("../models/followers"));
+const followStatus = function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const user = yield users_1.default.findOne({ alias: req.params.user });
-        const tweet = yield tweets_1.default.findOne({ _id: req.params.id });
-        const isLiked = yield likes_1.default.findOne({
-            father: req.params.id,
-            owner: req.params.user,
+        const user = yield users_1.default.findOne({ alias: req.params.fromUser });
+        const isFollowed = yield followers_1.default.findOne({
+            followed: req.params.toUser,
+            follower: req.params.fromUser,
         });
-        if (user && tweet) {
-            if (!isLiked && tweet.owner !== req.params.user) {
-                const newLike = new likes_1.default({
-                    owner: req.params.user,
-                    father: req.params.id,
-                });
-                yield newLike.save();
-                return res.status(200).json({ liked: true });
-            }
-            else if (isLiked && tweet.owner !== req.params.user) {
-                yield likes_1.default.deleteOne({ father: req.params.id });
-                return res.status(200).json({ liked: false });
-            }
+        if (user && !isFollowed) {
+            const newFollow = new followers_1.default({
+                followed: req.params.toUser,
+                follower: req.params.fromUser,
+            });
+            yield newFollow.save();
+            return res.status(200).json({ liked: true });
+        }
+        else if (user && isFollowed) {
+            yield followers_1.default.deleteOne({
+                followed: req.params.toUser,
+                follower: req.params.fromUser,
+            });
+            return res.status(200).json({ liked: false });
         }
         return res.status(400).json({ msg: "User not found" });
     });
 };
-exports.likeStatus = likeStatus;
+exports.followStatus = followStatus;
 const verifyStatus = function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const status = yield likes_1.default.findOne({
-            father: req.params.id,
-            owner: req.params.user,
+        const status = yield followers_1.default.findOne({
+            followed: req.params.toUser,
+            follower: req.params.fromUser,
         });
         if (status) {
             return res.status(200).json({ liked: true });
@@ -57,10 +56,10 @@ const verifyStatus = function (req, res) {
     });
 };
 exports.verifyStatus = verifyStatus;
-const countLikes = function (req, res) {
+const countFollowers = function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const LIKES = yield likes_1.default
-            .find({ father: req.params.id })
+        const FOLLOWING = yield followers_1.default
+            .find({ follower: req.params.fromUser })
             .estimatedDocumentCount()
             .then((count) => {
             return res.json({ count });
@@ -70,4 +69,4 @@ const countLikes = function (req, res) {
         });
     });
 };
-exports.countLikes = countLikes;
+exports.countFollowers = countFollowers;

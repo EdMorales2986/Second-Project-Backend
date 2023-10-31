@@ -5,7 +5,7 @@ export interface IComment extends mongoose.Document {
   desc: string;
   image: string;
   father: string;
-  likes: string[];
+  // likes: string[];
 }
 
 const CommentSchema = new mongoose.Schema(
@@ -29,10 +29,10 @@ const CommentSchema = new mongoose.Schema(
       require: true,
       trim: true,
     },
-    likes: {
-      type: [String],
-      default: [],
-    },
+    // likes: {
+    //   type: [String],
+    //   default: [],
+    // },
   },
   {
     timestamps: true,
