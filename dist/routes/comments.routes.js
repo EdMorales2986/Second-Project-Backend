@@ -10,4 +10,5 @@ router.put("/modifyComment/:user/:id", comments_controller_1.modifyComment);
 router.get("/commentLike/:user/:id", comments_controller_1.likeStatus);
 router.get("/commentLikeCount/:id", comments_controller_1.countLikes);
 router.get("/commentLikeVerify/:user/:id", comments_controller_1.verifyStatus);
+router.get("/commentCount/:id", comments_controller_1.countComments);
 exports.default = router;

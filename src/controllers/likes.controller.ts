@@ -42,9 +42,8 @@ export const verifyStatus = async function (req: Request, res: Response) {
 };
 
 export const countLikes = async function (req: Request, res: Response) {
-  const LIKES = await likes
-    .find({ father: req.params.id })
-    .estimatedDocumentCount()
+  await likes
+    .countDocuments({ father: req.params.id })
     .then((count) => {
       return res.json({ count });
     })

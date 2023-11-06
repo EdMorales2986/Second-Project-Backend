@@ -101,6 +101,17 @@ export const verifyStatus = async function (req: Request, res: Response) {
 
 export const countLikes = async function (req: Request, res: Response) {
   const LIKES = await likes
+    .countDocuments({ father: req.params.id })
+    .then((count) => {
+      return res.json({ count });
+    })
+    .catch((err) => {
+      return res.status(400).json({ err });
+    });
+};
+
+export const countComments = async function (req: Request, res: Response) {
+  const COMMENTS = await comments
     .find({ father: req.params.id })
     .estimatedDocumentCount()
     .then((count) => {

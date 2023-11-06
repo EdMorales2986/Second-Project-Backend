@@ -10,7 +10,7 @@ function createToken(user: IUser) {
   return jwt.sign(
     { id: user.id, alias: user.alias },
     `${process.env.JWTSECRET}`,
-    { expiresIn: "1800000" }
+    { expiresIn: "60000" }
   );
 }
 
@@ -138,6 +138,16 @@ export const updateBio = async function (req: Request, res: Response) {
   return res.status(200).json({ msg: "Bio updated" });
 };
 
+export const updateProfilePic = async function (req: Request, res: Response) {
+  const user = await users.findOne({ alias: req.params.user });
+  if (!user) {
+    return res.status(400).json({ msg: "User not found" });
+  }
+  user.profilePic = req.body.profilePic;
+  await user.save();
+  return res.status(200).json({ msg: "Profile picture updated" });
+};
+
 export const searchUser = async function (req: Request, res: Response) {
   const searchQuery = req.body.query;
 
@@ -150,30 +160,3 @@ export const searchUser = async function (req: Request, res: Response) {
     return res.status(400).json({ msg: "User not found" });
   }
 };
-
-/* example of data
-  {
-      "name": "Eduardo",
-      "lname": "Morales",
-      "email": "EdMo@gmail.com",
-      "alias": "Ed_123",
-      "bios": "Hi, i'm a computer engineering student",
-      "password": "bruh-123"
-  }
-  {
-      "name": "Alonso",
-      "lname": "Rondon",
-      "email": "AlRo@gmail.com",
-      "alias": "Al_123",
-      "bios": "Hi, i'm a computer engineering student",
-      "password": "bruh-123"
-  }
-  {
-    "name": "Alonso",
-    "lname": "Rondon",
-    "email": "Hell@gmail.com",
-    "bios": "I want to be a programmer",
-    "oldPass": "bruh-123",
-    "newPass": ""
-  }
-*/

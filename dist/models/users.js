@@ -51,6 +51,10 @@ const userSchema = new mongoose_1.default.Schema({
         type: String,
         default: "",
     },
+    profilePic: {
+        type: String,
+        default: "https://i.imgur.com/V4RclNb.png",
+    },
     // tweets: {
     //   type: [String],
     //   default: [],

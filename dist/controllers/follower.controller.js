@@ -17,25 +17,28 @@ const users_1 = __importDefault(require("../models/users"));
 const followers_1 = __importDefault(require("../models/followers"));
 const followStatus = function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const user = yield users_1.default.findOne({ alias: req.params.fromUser });
+        const follower = yield users_1.default.findOne({ alias: req.params.fromUser });
+        const user = yield users_1.default.findOne({ alias: req.params.toUser });
         const isFollowed = yield followers_1.default.findOne({
             followed: req.params.toUser,
             follower: req.params.fromUser,
         });
-        if (user && !isFollowed) {
-            const newFollow = new followers_1.default({
-                followed: req.params.toUser,
-                follower: req.params.fromUser,
-            });
-            yield newFollow.save();
-            return res.status(200).json({ liked: true });
-        }
-        else if (user && isFollowed) {
-            yield followers_1.default.deleteOne({
-                followed: req.params.toUser,
-                follower: req.params.fromUser,
-            });
-            return res.status(200).json({ liked: false });
+        if (user && follower) {
+            if (!isFollowed && req.params.fromUser !== req.params.toUser) {
+                const newFollow = new followers_1.default({
+                    followed: req.params.toUser,
+                    follower: req.params.fromUser,
+                });
+                yield newFollow.save();
+                return res.status(200).json({ followed: true });
+            }
+            else if (isFollowed && req.params.fromUser !== req.params.toUser) {
+                yield followers_1.default.deleteOne({
+                    followed: req.params.toUser,
+                    follower: req.params.fromUser,
+                });
+                return res.status(200).json({ followed: false });
+            }
         }
         return res.status(400).json({ msg: "User not found" });
     });
@@ -59,8 +62,7 @@ exports.verifyStatus = verifyStatus;
 const countFollowers = function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const FOLLOWING = yield followers_1.default
-            .find({ follower: req.params.fromUser })
-            .estimatedDocumentCount()
+            .countDocuments({ father: req.params.fromUser })
             .then((count) => {
             return res.json({ count });
         })

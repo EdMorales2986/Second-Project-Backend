@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.countLikes = exports.verifyStatus = exports.likeStatus = exports.modifyComment = exports.deleteComment = exports.createComment = exports.getAllComments = void 0;
+exports.countComments = exports.countLikes = exports.verifyStatus = exports.likeStatus = exports.modifyComment = exports.deleteComment = exports.createComment = exports.getAllComments = void 0;
 const users_1 = __importDefault(require("../models/users"));
 const likes_1 = __importDefault(require("../models/likes"));
 const comments_1 = __importDefault(require("../models/comments"));
@@ -120,6 +120,19 @@ exports.verifyStatus = verifyStatus;
 const countLikes = function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const LIKES = yield likes_1.default
+            .countDocuments({ father: req.params.id })
+            .then((count) => {
+            return res.json({ count });
+        })
+            .catch((err) => {
+            return res.status(400).json({ err });
+        });
+    });
+};
+exports.countLikes = countLikes;
+const countComments = function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const COMMENTS = yield comments_1.default
             .find({ father: req.params.id })
             .estimatedDocumentCount()
             .then((count) => {
@@ -130,4 +143,4 @@ const countLikes = function (req, res) {
         });
     });
 };
-exports.countLikes = countLikes;
+exports.countComments = countComments;

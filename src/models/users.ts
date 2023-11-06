@@ -8,6 +8,7 @@ export interface IUser extends mongoose.Document {
   alias: string;
   password: string;
   bios: string;
+  profilePic: string;
   // tweets: string[];
   // followers: string[];
   comparePassword: (password: string) => Promise<boolean>;
@@ -49,6 +50,10 @@ const userSchema = new mongoose.Schema({
   bios: {
     type: String,
     default: "",
+  },
+  profilePic: {
+    type: String,
+    default: "https://i.imgur.com/V4RclNb.png",
   },
   // tweets: {
   //   type: [String],

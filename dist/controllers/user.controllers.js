@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.searchUser = exports.updateBio = exports.updateInfo = exports.deleteUser = exports.signIn = exports.signUp = void 0;
+exports.searchUser = exports.updateProfilePic = exports.updateBio = exports.updateInfo = exports.deleteUser = exports.signIn = exports.signUp = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const users_1 = __importDefault(require("../models/users"));
 const followers_1 = __importDefault(require("../models/followers"));
@@ -20,7 +20,7 @@ const likes_1 = __importDefault(require("../models/likes"));
 const tweets_1 = __importDefault(require("../models/tweets"));
 const comments_1 = __importDefault(require("../models/comments"));
 function createToken(user) {
-    return jsonwebtoken_1.default.sign({ id: user.id, alias: user.alias }, `${process.env.JWTSECRET}`, { expiresIn: "1800000" });
+    return jsonwebtoken_1.default.sign({ id: user.id, alias: user.alias }, `${process.env.JWTSECRET}`, { expiresIn: "60000" });
 }
 function validateEmail(email) {
     const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -145,6 +145,18 @@ const updateBio = function (req, res) {
     });
 };
 exports.updateBio = updateBio;
+const updateProfilePic = function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const user = yield users_1.default.findOne({ alias: req.params.user });
+        if (!user) {
+            return res.status(400).json({ msg: "User not found" });
+        }
+        user.profilePic = req.body.profilePic;
+        yield user.save();
+        return res.status(200).json({ msg: "Profile picture updated" });
+    });
+};
+exports.updateProfilePic = updateProfilePic;
 const searchUser = function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const searchQuery = req.body.query;
@@ -160,29 +172,3 @@ const searchUser = function (req, res) {
     });
 };
 exports.searchUser = searchUser;
-/* example of data
-  {
-      "name": "Eduardo",
-      "lname": "Morales",
-      "email": "EdMo@gmail.com",
-      "alias": "Ed_123",
-      "bios": "Hi, i'm a computer engineering student",
-      "password": "bruh-123"
-  }
-  {
-      "name": "Alonso",
-      "lname": "Rondon",
-      "email": "AlRo@gmail.com",
-      "alias": "Al_123",
-      "bios": "Hi, i'm a computer engineering student",
-      "password": "bruh-123"
-  }
-  {
-    "name": "Alonso",
-    "lname": "Rondon",
-    "email": "Hell@gmail.com",
-    "bios": "I want to be a programmer",
-    "oldPass": "bruh-123",
-    "newPass": ""
-  }
-*/

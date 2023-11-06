@@ -7,6 +7,7 @@ import {
   likeStatus,
   countLikes,
   verifyStatus,
+  countComments,
 } from "../controllers/comments.controller";
 
 const router = Router();
@@ -18,5 +19,6 @@ router.put("/modifyComment/:user/:id", modifyComment);
 router.get("/commentLike/:user/:id", likeStatus);
 router.get("/commentLikeCount/:id", countLikes);
 router.get("/commentLikeVerify/:user/:id", verifyStatus);
+router.get("/commentCount/:id", countComments);
 
 export default router;

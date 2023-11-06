@@ -59,9 +59,8 @@ const verifyStatus = function (req, res) {
 exports.verifyStatus = verifyStatus;
 const countLikes = function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const LIKES = yield likes_1.default
-            .find({ father: req.params.id })
-            .estimatedDocumentCount()
+        yield likes_1.default
+            .countDocuments({ father: req.params.id })
             .then((count) => {
             return res.json({ count });
         })
