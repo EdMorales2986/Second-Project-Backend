@@ -51,10 +51,10 @@ const verifyStatus = function (req, res) {
             follower: req.params.fromUser,
         });
         if (status) {
-            return res.status(200).json({ liked: true });
+            return res.status(200).json({ followed: true });
         }
         else {
-            return res.status(200).json({ liked: false });
+            return res.status(200).json({ followed: false });
         }
     });
 };
@@ -62,7 +62,7 @@ exports.verifyStatus = verifyStatus;
 const countFollowers = function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const FOLLOWING = yield followers_1.default
-            .countDocuments({ father: req.params.fromUser })
+            .countDocuments({ follower: req.params.fromUser })
             .then((count) => {
             return res.json({ count });
         })

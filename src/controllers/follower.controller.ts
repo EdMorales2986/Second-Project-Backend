@@ -38,15 +38,15 @@ export const verifyStatus = async function (req: Request, res: Response) {
     follower: req.params.fromUser,
   });
   if (status) {
-    return res.status(200).json({ liked: true });
+    return res.status(200).json({ followed: true });
   } else {
-    return res.status(200).json({ liked: false });
+    return res.status(200).json({ followed: false });
   }
 };
 
 export const countFollowers = async function (req: Request, res: Response) {
   const FOLLOWING = await followers
-    .countDocuments({ father: req.params.fromUser })
+    .countDocuments({ follower: req.params.fromUser })
     .then((count) => {
       return res.json({ count });
     })

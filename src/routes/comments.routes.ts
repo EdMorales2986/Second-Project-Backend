@@ -12,7 +12,7 @@ import {
 
 const router = Router();
 
-router.get("/showAllComments", getAllComments);
+router.get("/showAllComments/:id", getAllComments);
 router.post("/createComment/:user/:father", createComment);
 router.delete("/deleteComment/:user/:id", deleteComment);
 router.put("/modifyComment/:user/:id", modifyComment);

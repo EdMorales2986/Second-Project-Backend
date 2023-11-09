@@ -17,6 +17,7 @@ const users_1 = __importDefault(require("../models/users"));
 const followers_1 = __importDefault(require("../models/followers"));
 const likes_1 = __importDefault(require("../models/likes"));
 const tweets_1 = __importDefault(require("../models/tweets"));
+const comments_1 = __importDefault(require("../models/comments"));
 const getAllTweetsNew = function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const TWEETS = yield tweets_1.default.find({}).sort({ createdAt: -1 });
@@ -96,10 +97,8 @@ const deleteTweet = function (req, res) {
         const TWEET = yield tweets_1.default.findOne({ _id: req.params.id });
         if (TWEET && TWEET.owner === req.params.user) {
             yield tweets_1.default.deleteOne({ _id: req.params.id });
-            // await users.findOneAndUpdate(
-            //   { alias: req.params.user },
-            //   { $pull: { tweets: req.params.id } }
-            // );
+            yield comments_1.default.deleteMany({ father: req.params.id });
+            yield likes_1.default.deleteMany({ father: req.params.id });
             return res.json({ msg: "Tweet deleted" });
         }
         return res

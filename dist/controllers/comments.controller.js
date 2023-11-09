@@ -47,6 +47,7 @@ const deleteComment = function (req, res) {
         const COMMENT = yield comments_1.default.findOne({ _id: req.params.id });
         if (COMMENT && COMMENT.owner === req.params.user) {
             yield comments_1.default.deleteOne({ _id: req.params.id });
+            yield likes_1.default.deleteMany({ father: req.params.id });
             return res.json({ msg: "Comment deleted" });
         }
         return res
@@ -60,11 +61,11 @@ const modifyComment = function (req, res) {
         const COMMENT = yield comments_1.default.findOne({ _id: req.params.id });
         if (COMMENT && COMMENT.owner === req.params.user) {
             COMMENT.desc =
-                req.body.desc !== undefined || req.body.desc !== ""
+                req.body.desc !== undefined && req.body.desc !== ""
                     ? req.body.desc
                     : COMMENT.desc;
             COMMENT.image =
-                req.body.image !== undefined || req.body.image !== ""
+                req.body.image !== undefined && req.body.image !== ""
                     ? req.body.image
                     : COMMENT.image;
             yield COMMENT.save();
@@ -133,8 +134,7 @@ exports.countLikes = countLikes;
 const countComments = function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const COMMENTS = yield comments_1.default
-            .find({ father: req.params.id })
-            .estimatedDocumentCount()
+            .countDocuments({ father: req.params.id })
             .then((count) => {
             return res.json({ count });
         })

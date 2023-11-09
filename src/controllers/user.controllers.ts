@@ -10,7 +10,7 @@ function createToken(user: IUser) {
   return jwt.sign(
     { id: user.id, alias: user.alias },
     `${process.env.JWTSECRET}`,
-    { expiresIn: "60000" }
+    { expiresIn: "7d" }
   );
 }
 
@@ -109,6 +109,31 @@ export const updateInfo = async function (req: Request, res: Response) {
   const user = await users.findOne({ alias: req.params.user });
   if (!user) {
     return res.status(400).json({ msg: "User not found" });
+  }
+
+  const userEmail = await users.findOne({ email: req.body.email });
+  if (req.body.email !== "" && req.body.email !== undefined) {
+    if (userEmail) {
+      return res
+        .status(400)
+        .json({ msg: "The user/email is already registered" });
+    }
+
+    if (!validateEmail(req.body.email)) {
+      return res.status(400).json({ msg: "The email is not valid" });
+    }
+  }
+
+  if (req.body.newPass !== "" && req.body.newPass !== undefined) {
+    if (req.body.newPass.length < 8) {
+      return res
+        .status(400)
+        .json({ msg: "The password must be at least 8 characters" });
+    } else if (req.body.newPass.length > 16) {
+      return res
+        .status(400)
+        .json({ msg: "The password must be less than 16 characters" });
+    }
   }
 
   const isMatch = await user.comparePassword(req.body.oldPass);

@@ -20,7 +20,7 @@ const likes_1 = __importDefault(require("../models/likes"));
 const tweets_1 = __importDefault(require("../models/tweets"));
 const comments_1 = __importDefault(require("../models/comments"));
 function createToken(user) {
-    return jsonwebtoken_1.default.sign({ id: user.id, alias: user.alias }, `${process.env.JWTSECRET}`, { expiresIn: "60000" });
+    return jsonwebtoken_1.default.sign({ id: user.id, alias: user.alias }, `${process.env.JWTSECRET}`, { expiresIn: "7d" });
 }
 function validateEmail(email) {
     const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -115,6 +115,29 @@ const updateInfo = function (req, res) {
         const user = yield users_1.default.findOne({ alias: req.params.user });
         if (!user) {
             return res.status(400).json({ msg: "User not found" });
+        }
+        const userEmail = yield users_1.default.findOne({ email: req.body.email });
+        if (req.body.email !== "" && req.body.email !== undefined) {
+            if (userEmail) {
+                return res
+                    .status(400)
+                    .json({ msg: "The user/email is already registered" });
+            }
+            if (!validateEmail(req.body.email)) {
+                return res.status(400).json({ msg: "The email is not valid" });
+            }
+        }
+        if (req.body.newPass !== "" && req.body.newPass !== undefined) {
+            if (req.body.newPass.length < 8) {
+                return res
+                    .status(400)
+                    .json({ msg: "The password must be at least 8 characters" });
+            }
+            else if (req.body.newPass.length > 16) {
+                return res
+                    .status(400)
+                    .json({ msg: "The password must be less than 16 characters" });
+            }
         }
         const isMatch = yield user.comparePassword(req.body.oldPass);
         if (user && isMatch) {

@@ -35,6 +35,7 @@ export const deleteComment = async function (req: Request, res: Response) {
 
   if (COMMENT && COMMENT.owner === req.params.user) {
     await comments.deleteOne({ _id: req.params.id });
+    await likes.deleteMany({ father: req.params.id });
 
     return res.json({ msg: "Comment deleted" });
   }
@@ -47,11 +48,11 @@ export const modifyComment = async function (req: Request, res: Response) {
   const COMMENT = await comments.findOne({ _id: req.params.id });
   if (COMMENT && COMMENT.owner === req.params.user) {
     COMMENT.desc =
-      req.body.desc !== undefined || req.body.desc !== ""
+      req.body.desc !== undefined && req.body.desc !== ""
         ? req.body.desc
         : COMMENT.desc;
     COMMENT.image =
-      req.body.image !== undefined || req.body.image !== ""
+      req.body.image !== undefined && req.body.image !== ""
         ? req.body.image
         : COMMENT.image;
     await COMMENT.save();
@@ -112,8 +113,7 @@ export const countLikes = async function (req: Request, res: Response) {
 
 export const countComments = async function (req: Request, res: Response) {
   const COMMENTS = await comments
-    .find({ father: req.params.id })
-    .estimatedDocumentCount()
+    .countDocuments({ father: req.params.id })
     .then((count) => {
       return res.json({ count });
     })

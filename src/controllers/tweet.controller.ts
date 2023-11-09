@@ -78,10 +78,8 @@ export const deleteTweet = async function (req: Request, res: Response) {
 
   if (TWEET && TWEET.owner === req.params.user) {
     await tweets.deleteOne({ _id: req.params.id });
-    // await users.findOneAndUpdate(
-    //   { alias: req.params.user },
-    //   { $pull: { tweets: req.params.id } }
-    // );
+    await comments.deleteMany({ father: req.params.id });
+    await likes.deleteMany({ father: req.params.id });
     return res.json({ msg: "Tweet deleted" });
   }
   return res
